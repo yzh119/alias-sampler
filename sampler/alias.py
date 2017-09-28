@@ -25,6 +25,7 @@ def construct(probs, eps):
             large[head_large] = (q - (aver - p), j)
         elif q - (aver - p) < aver - eps:
             small.append((q - (aver - p), j))
+            head_large += 1
         else:
             head_large += 1
 
