@@ -33,7 +33,7 @@ def construct(probs, eps):
 
 
 class AliasSampler(object):
-    def __init__(self, probs, eps=1e-9):
+    def __init__(self, probs, eps=1e-12):
         self.probs = probs
         self.thres, self.idx_upper = construct(self.probs, eps)
         self.aver = 1.0 / len(probs)
