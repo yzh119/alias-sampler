@@ -1,5 +1,6 @@
 import random
-
+import time
+import numpy as np
 
 def construct(probs, eps):
     idx_upper = [-1 for i in xrange(len(probs))]
@@ -38,10 +39,15 @@ class AliasSampler(object):
         self.thres, self.idx_upper = construct(self.probs, eps)
         self.aver = 1.0 / len(probs)
 
-    def get_sample(self):
+    def draw(self):
         x = random.randint(0, len(self.probs) - 1)
         y = random.random() * self.aver
         return x if y < self.thres[x] else self.idx_upper[x]
+
+    def draw_batch(self, batch_size):
+        x_batch = np.random.randint(len(self.probs), size=batch_size)
+        y_batch = np.random.rand(batch_size) * self.aver
+        return [x if y < self.thres[x] else self.idx_upper[x] for x, y in zip(x_batch, y_batch)]
 
 
 if __name__ == '__main__':
@@ -49,5 +55,16 @@ if __name__ == '__main__':
     cnt = [0 for _ in range(7)]
     tot = 1000000
     for i in range(tot):
-        cnt[AS.get_sample()] += 1
+        cnt[AS.draw()] += 1
     print [1.0 * x / tot for x in cnt]
+    
+    start_time = time.time()
+    gen_batch_1 = [AS.draw() for _ in range(tot * 10)]
+    print time.time() - start_time
+    start_time = time.time()
+    gen_batch_2 = AS.draw_batch(tot * 10)
+    print time.time() - start_time
+    cnt = [0 for _ in range(7)]
+    for item in gen_batch_2:
+        cnt[item] += 1
+    print cnt
